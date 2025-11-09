@@ -83,43 +83,30 @@ def calibrate_camera(
     print("\nCalibrating camera...")
 
     # Convert and ensure contiguous memory layout
-    objpoints = [np.ascontiguousarray(op, dtype=np.float64).reshape(-1, 1, 3) for op in objpoints]
-    imgpoints = [np.ascontiguousarray(ip, dtype=np.float64).reshape(-1, 1, 2) for ip in imgpoints]
+    objpoints = [np.ascontiguousarray(op, dtype=np.float32).reshape(-1, 1, 3) for op in objpoints]
+    imgpoints = [np.ascontiguousarray(ip, dtype=np.float32).reshape(-1, 1, 2) for ip in imgpoints]
+
 
     img_shape = tuple(map(int, gray.shape[::-1]))
     print("Image size used for calibration:", img_shape)
 
     # Safer calibration flags (disable extra distortion parameters)
-    flags = (
-        cv2.CALIB_FIX_K4
-        + cv2.CALIB_FIX_K5
-        + cv2.CALIB_FIX_K6
-        + cv2.CALIB_ZERO_TANGENT_DIST
-    )
+    flags = cv2.CALIB_FIX_K3
 
     try:
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
-            objpoints,
-            imgpoints,
-            img_shape,
-            None,
-            None,
-            flags=flags
+            objpoints, imgpoints, img_shape, None, None, flags=flags
         )
     except cv2.error as e:
-        print("Calibration failed due to numeric instability:", e)
-        print("Retrying with fewer images...")
-        # Retry using only the first 6 images (more variation often helps)
+        print("First calibration attempt failed:", e)
+        print("Retrying with fewer images and simpler flags...")
+        flags = 0
+        subset = min(6, len(objpoints))
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
-            objpoints[:6],
-            imgpoints[:6],
-            img_shape,
-            None,
-            None,
-            flags=flags
+            objpoints[:subset], imgpoints[:subset], img_shape, None, None, flags=flags
         )
 
-    print("\Calibration successful")
+    print("Calibration successful")
     print("RMS re-projection error:", ret)
     print("Camera Matrix (intrinsic):\n", mtx)
     print("Distortion coefficients:\n", dist.ravel())

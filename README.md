@@ -137,6 +137,7 @@ o3d.visualization.draw_geometries([pcd])
 ---
 
 ## 🧾 Notes
+- Before running make sure to add your chessboard_images and the pictures of the object or view.
 - Make sure your input photos have **overlapping fields of view** and **good texture**.
 - Calibration should be done once per camera setup.
 - Use **diverse angles** in chessboard photos to avoid instability.
