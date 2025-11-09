@@ -1,0 +1,6 @@
+opencv-python
+tqdm
+numpy
+scipy
+open3d
+matplotlib
