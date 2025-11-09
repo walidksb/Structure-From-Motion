@@ -32,12 +32,11 @@ SfM-Project/
 │
 ├── main.py                # Entry point – runs the SFM pipeline
 ├── pipeline.py            # Main pipeline logic (calls all modules)
-├── Calibration.py         # Camera calibration using chessboard images
+├── calibration.py         # Camera calibration using chessboard images
 ├── feature_matching.py    # SIFT-based keypoint detection & matching
 ├── triangulation.py       # 3D point triangulation from image pairs
 ├── point_cloud.py         # Export final point cloud using Open3D
 ├── bundle_adjustment.py   # (Optional) Non-linear optimization
-├── another.py             # Extended bundle adjustment + visualization
 ├── Chessboard_Images/     # Folder for calibration photos
 ├── photos/                # Folder with scene images for reconstruction
 └── camera_calib.npz       # Saved calibration parameters (auto-generated)
@@ -72,7 +71,7 @@ conda install -c conda-forge opencv numpy open3d scipy matplotlib tqdm
 ### 🪄 1. Camera Calibration
 Uses a chessboard pattern (8×10 squares → 7×9 inner corners):
 ```bash
-python Calibration.py
+python calibration.py
 ```
 Outputs:
 - `camera_calib.npz` containing:
@@ -119,12 +118,11 @@ You can open the resulting `output.ply` in **Meshlab** or **Open3D** to visualiz
 
 | File | Description |
 |------|--------------|
-| **Calibration.py** | Detects checkerboard corners and computes intrinsic camera parameters |
+| **calibration.py** | Detects checkerboard corners and computes intrinsic camera parameters |
 | **feature_matching.py** | Extracts and matches SIFT features between image pairs |
 | **triangulation.py** | Converts 2D point correspondences into 3D coordinates |
 | **bundle_adjustment.py** | Performs optimization of poses and structure using least squares |
 | **point_cloud.py** | Exports reconstructed 3D points and colors to `.ply` |
-| **another.py** | Advanced experimental SfM + BA implementation |
 
 ---
 

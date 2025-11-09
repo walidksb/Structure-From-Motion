@@ -31,12 +31,8 @@ def calibrate_camera(
     """
 
     # --- Prepare real-world 3D coordinates for the checkerboard pattern ---
-    square_size = 25.0  # mm per square (adjust if different)
     objp = np.zeros((chessboard_size[0] * chessboard_size[1], 3), np.float32)
-    objp[:, :2] = (
-        np.mgrid[0:chessboard_size[0], 0:chessboard_size[1]]
-        .T.reshape(-1, 2) * square_size
-    )
+    objp[:, :2] = np.mgrid[0 : chessboard_size[0], 0 : chessboard_size[1]].T.reshape(-1, 2)
 
     objpoints = []  # 3D points
     imgpoints = []  # 2D points
@@ -49,14 +45,14 @@ def calibrate_camera(
     if not images:
         raise FileNotFoundError(f"No calibration images found in: {image_path}")
 
-    print(f"🔍 Found {len(images)} chessboard images.")
+    print(f"Found {len(images)} chessboard images.")
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
     # --- Detect corners ---
     for img_path in images:
         img = cv2.imread(img_path)
         if img is None:
-            print(f"❌ Cannot read {img_path}")
+            print(f"Cannot read {img_path}")
             continue
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -64,7 +60,7 @@ def calibrate_camera(
 
         ret, corners = cv2.findChessboardCorners(gray, chessboard_size, None)
         if not ret:
-            print(f"⚠️ Chessboard not detected in {os.path.basename(img_path)}")
+            print(f"Chessboard not detected in {os.path.basename(img_path)}")
             continue
 
         corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
@@ -78,7 +74,7 @@ def calibrate_camera(
                 cv2.imshow("Detected Corners", vis)
                 cv2.waitKey(400)
         else:
-            print(f"⚠️ Corner refinement failed for {os.path.basename(img_path)}")
+            print(f"Corner refinement failed for {os.path.basename(img_path)}")
 
     cv2.destroyAllWindows()
 
@@ -91,7 +87,7 @@ def calibrate_camera(
     imgpoints = [np.ascontiguousarray(ip, dtype=np.float64).reshape(-1, 1, 2) for ip in imgpoints]
 
     img_shape = tuple(map(int, gray.shape[::-1]))
-    print("🖼️ Image size used for calibration:", img_shape)
+    print("Image size used for calibration:", img_shape)
 
     # Safer calibration flags (disable extra distortion parameters)
     flags = (
@@ -111,7 +107,7 @@ def calibrate_camera(
             flags=flags
         )
     except cv2.error as e:
-        print("⚠️ Calibration failed due to numeric instability:", e)
+        print("Calibration failed due to numeric instability:", e)
         print("Retrying with fewer images...")
         # Retry using only the first 6 images (more variation often helps)
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
@@ -123,14 +119,14 @@ def calibrate_camera(
             flags=flags
         )
 
-    print("\n✅ Calibration successful")
+    print("\Calibration successful")
     print("RMS re-projection error:", ret)
     print("Camera Matrix (intrinsic):\n", mtx)
     print("Distortion coefficients:\n", dist.ravel())
 
     save_path = os.path.join(base_path, "camera_calib.npz")
     np.savez(save_path, K=mtx, dist=dist, error=ret)
-    print(f"💾 Calibration saved to {save_path}")
+    print(f"Calibration saved to {save_path}")
 
 
     return mtx, dist

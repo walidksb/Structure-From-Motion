@@ -8,4 +8,4 @@ def export_point_cloud(points, colors, filename="output.ply"):
     pc.colors = o3d.utility.Vector3dVector(colors / 255.0)
 
     o3d.io.write_point_cloud(filename, pc)
-    print(f"✅ Point cloud saved: {filename}")
+    print(f"Point cloud saved: {filename}")
